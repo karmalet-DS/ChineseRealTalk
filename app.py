@@ -6,9 +6,14 @@ ChineseRealTalk — 소셜미디어 중국어 텍스트 교육화 플랫폼
        소셜미디어 텍스트의 교육적 변환과 활용"
 """
 
+import os
 import json
 import streamlit as st
+from dotenv import load_dotenv
 from utils.llm import call_llm
+
+# .env 파일 로드 (있으면)
+load_dotenv()
 from utils.prompts import (
     ADAPT_SYSTEM, ADAPT_USER,
     GLOSS_SYSTEM, GLOSS_USER,
@@ -99,10 +104,24 @@ with st.sidebar:
     provider = st.selectbox("LLM 제공자", ["OpenAI", "Anthropic (Claude)"])
 
     if provider == "OpenAI":
-        api_key = st.text_input("OpenAI API Key", type="password", placeholder="sk-...")
+        _default_key = os.getenv("OPENAI_API_KEY", "")
+        api_key = st.text_input(
+            "OpenAI API Key",
+            value=_default_key,
+            type="password",
+            placeholder="sk-...",
+            help=".env 파일에서 자동 로드됩니다."
+        )
         model = st.selectbox("모델", ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"])
     else:
-        api_key = st.text_input("Anthropic API Key", type="password", placeholder="sk-ant-...")
+        _default_key = os.getenv("ANTHROPIC_API_KEY", "")
+        api_key = st.text_input(
+            "Anthropic API Key",
+            value=_default_key,
+            type="password",
+            placeholder="sk-ant-...",
+            help=".env 파일에서 자동 로드됩니다."
+        )
         model = st.selectbox("모델", [
             "claude-opus-4-5",
             "claude-sonnet-4-5",
