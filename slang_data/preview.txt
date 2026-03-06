@@ -1,0 +1,44 @@
+
+=== 2022검색지수.xlsx ===
+  Sheet: Sheet1 (101 rows x 11 cols)
+  (None, '流行语名称', '总日均', '总同比', '总环比', 'PC端日均', 'PC端同比', 'PC端环比', '移动端日均', '移动端同比', '移动端环比')
+  (0, '十七大', 931, 6, 6, 244, -8, -8, 686, 13, 13)
+  (1, '嫦娥一号', 543, -13, -13, 197, '-', '-', 345, -19, -19)
+  (2, '民生', 1439, -2, -2, 536, -23, -23, 902, 17, 17)
+  (3, '香港回归十周年', 30, 32, 32, 7, -19, -19, 22, 71, 71)
+  (4, 'CPI上涨', '-', '-', '-', '-', '-', '-', '-', '-', '-')
+  (5, '廉租房', 756, -6, -6, 143, -9, -9, 613, -5, -5)
+  (6, '奥运火炬手', 88, -16, -16, 18, -45, -45, 70, -3, -3)
+
+=== word.xlsx ===
+  Sheet: Sheet1 (1226 rows x 2 cols)
+  (None, '流行语名称')
+  (0, '十七大')
+  (1, '嫦娥一号')
+  (2, '民生')
+  (3, '香港回归十周年')
+  (4, 'CPI上涨')
+  (5, '廉租房')
+  (6, '奥运火炬手')
+
+=== 流行语분류.xlsx ===
+  Sheet: 工作表1 (1226 rows x 31 cols)
+  ('年份', '流行语名称', '来源', '生成', '是否有衍生', '性质', '内容', '内容细分', None, '形式构词', '公布', '释义', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+  (2007, '十七大', '国家事件、官方用语', '直接引用', '否', '正向', '社会', '社会生活', '政治', None, '国家语言资源监测与研究中心中国媒体十大流行语', '十七大一般指中国共产党第十七次全国代表大会。', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+  (2007, '嫦娥一号', '国家事件、官方用语', '直接引用', '否', '正向', '社会', '社会生活', '政治、科技', None, '国家语言资源监测与研究中心中国媒体十大流行语', '嫦娥一号是中国探月计划中的第一颗绕月人造卫星，以中国古代神话人物嫦娥命名。', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+  (2007, '民生', '官方用言', '直接引用', '否', '中性', '社会', '社会生活', '政治', None, '国家语言资源监测与研究中心中国媒体十大流行语', '民生，民是指人民，民生指人民的日常生活事项，例如衣、食、住、行、就业、娱乐、家庭、社团、公司、旅游等。广义上的民生概念是指，凡是同民生有关的，包括直接相关和间接相关的事情都属于民生范围内的事情。', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+  (2007, '香港回归十周年', '国家事件、官方用语', '直接引用', '否', '正向', '社会、文化', '社会生活、精神文化', '政治', None, '国家语言资源监测与研究中心中国媒体十大流行语', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+  (2007, 'CPI上涨', '现象热点、官方用语', '直接引用', '否', '正向', '社会', '社会生活', '政治、经济', None, '国家语言资源监测与研究中心中国媒体十大流行语', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+  (2007, '廉租房', '现象热点、官方用语', '直接引用', '否', '中性', '社会', '社会生活', '政治、民生', None, '国家语言资源监测与研究中心中国媒体十大流行语', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+  (2007, '奥运火炬手', '现象热点', '直接引用', '否', '正向', '社会、群体', '社会生活', '体育', None, '国家语言资源监测与研究中心中国媒体十大流行语', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+
+=== 모순표현.xlsx ===
+  Sheet: Sheet1 (66 rows x 4 cols)
+  ('年份', '本身是矛盾表达的词', '当年构成矛盾冲突的词（偏积极）', '当年构成矛盾冲突的词（偏消极）')
+  (2007, '白奴', '晒客', '河蟹')
+  (2008, '很好很强大', '不抛弃不放弃', '打酱油')
+  (2009, '被增长', None, None)
+  (None, '被就业', None, None)
+  (2010, '羡慕嫉妒恨', '神马都是浮云', '羡慕嫉妒恨')
+  (None, None, '给力', '艰难/我勒个去')
+  (None, None, '淡定', '任性/鸭梨')
