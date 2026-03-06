@@ -104,24 +104,30 @@ with st.sidebar:
     provider = st.selectbox("LLM 제공자", ["OpenAI", "Anthropic (Claude)"])
 
     if provider == "OpenAI":
-        _default_key = os.getenv("OPENAI_API_KEY", "")
-        api_key = st.text_input(
-            "OpenAI API Key",
-            value=_default_key,
-            type="password",
-            placeholder="sk-...",
-            help=".env 파일에서 자동 로드됩니다."
-        )
+        _env_key = os.getenv("OPENAI_API_KEY", "")
+        if _env_key:
+            st.success("✅ API 키: .env에서 자동 로드됨")
+            api_key = _env_key
+        else:
+            api_key = st.text_input(
+                "OpenAI API Key",
+                type="password",
+                placeholder="sk-...",
+                help=".env 파일에 OPENAI_API_KEY를 추가하면 자동 로드됩니다."
+            )
         model = st.selectbox("모델", ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"])
     else:
-        _default_key = os.getenv("ANTHROPIC_API_KEY", "")
-        api_key = st.text_input(
-            "Anthropic API Key",
-            value=_default_key,
-            type="password",
-            placeholder="sk-ant-...",
-            help=".env 파일에서 자동 로드됩니다."
-        )
+        _env_key = os.getenv("ANTHROPIC_API_KEY", "")
+        if _env_key:
+            st.success("✅ API 키: .env에서 자동 로드됨")
+            api_key = _env_key
+        else:
+            api_key = st.text_input(
+                "Anthropic API Key",
+                type="password",
+                placeholder="sk-ant-...",
+                help=".env 파일에 ANTHROPIC_API_KEY를 추가하면 자동 로드됩니다."
+            )
         model = st.selectbox("모델", [
             "claude-opus-4-5",
             "claude-sonnet-4-5",
