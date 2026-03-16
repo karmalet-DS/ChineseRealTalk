@@ -101,7 +101,7 @@ with st.sidebar:
     st.divider()
 
     st.markdown("### ⚙️ API 설정")
-    provider = st.selectbox("LLM 제공자", ["OpenAI", "Anthropic (Claude)"])
+    provider = st.selectbox("LLM 제공자", ["Anthropic (Claude)", "OpenAI"])
 
     if provider == "OpenAI":
         _env_key = os.getenv("OPENAI_API_KEY", "")
@@ -129,8 +129,8 @@ with st.sidebar:
                 help=".env 파일에 ANTHROPIC_API_KEY를 추가하면 자동 로드됩니다."
             )
         model = st.selectbox("모델", [
-            "claude-opus-4-5",
             "claude-sonnet-4-5",
+            "claude-opus-4-5",
             "claude-haiku-4-5",
         ])
 
