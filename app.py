@@ -411,7 +411,7 @@ with tab3:
             ["객관식", "단답형", "O/X", "서술형"],
             default=["객관식", "단답형"],
         )
-        q_count = st.number_input("이해 확인 문항 수", min_value=1, max_value=10, value=5)
+        q_count = st.number_input("이해 확인 문항 수", min_value=1, max_value=10, value=2)
         run_quiz = st.button("📋 활동 생성", type="primary", use_container_width=True, key="btn_quiz")
 
     with col_right:
