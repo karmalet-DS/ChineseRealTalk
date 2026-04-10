@@ -19,6 +19,9 @@ from utils.prompts import (
     GLOSS_SYSTEM, GLOSS_USER,
     QUIZ_SYSTEM, QUIZ_USER,
 )
+from utils.hsk_vocab import (
+    analyze_text, vocab_available, get_level_tags, format_levels,
+)
 
 # ─────────────────────────────────────────────
 # 페이지 설정
@@ -136,8 +139,23 @@ with st.sidebar:
 
     st.divider()
     st.markdown("### 📚 HSK 수준 설정")
-    hsk_level = st.slider("목표 HSK 수준", min_value=1, max_value=6, value=4,
-                          help="변환·주석·문항 생성 시 기준이 되는 학습자 HSK 수준")
+    hsk_system = st.radio(
+        "HSK 체계",
+        options=["old", "new", "newest"],
+        format_func=lambda s: {
+            "old":    "HSK 2.0 (구 6급)",
+            "new":    "HSK 3.0 (신 9급)",
+            "newest": "HSK 3.0 최신판",
+        }[s],
+        horizontal=True,
+        help="어휘부(drkameleon/complete-hsk-vocabulary)에서 단어 급수를 조회할 때 사용할 체계입니다.",
+    )
+    _max_level = 6 if hsk_system == "old" else 7   # new/newest-7은 7-9급 통합
+    hsk_level = st.slider(
+        "목표 HSK 수준",
+        min_value=1, max_value=_max_level, value=4,
+        help="변환·주석·문항 생성 시 기준이 되는 학습자 HSK 수준",
+    )
 
     st.divider()
     st.markdown("""
@@ -234,6 +252,48 @@ with tab1:
                         file_name=f"ChineseRealTalk_변환_HSK{hsk_level}.txt",
                         mime="text/plain",
                     )
+
+                    # ───── HSK 어휘부 기반 사후 검증 ─────
+                    if vocab_available():
+                        adapted_only = result
+                        if "[변환 텍스트]" in result:
+                            tail = result.split("[변환 텍스트]", 1)[1]
+                            adapted_only = tail.split("[변경 목록]", 1)[0]
+
+                        try:
+                            stats = analyze_text(adapted_only, hsk_level, system=hsk_system)
+
+                            st.markdown("#### 📊 HSK 어휘 부합도 (wordlist 기준)")
+                            m1, m2, m3 = st.columns(3)
+                            m1.metric("전체 어휘(유니크)", stats["total"])
+                            m2.metric(f"{hsk_system} ≤ {hsk_level}급", stats["in_level_count"])
+                            m3.metric("부합률", f"{stats['coverage']*100:.1f}%")
+
+                            import pandas as pd
+                            rows = [
+                                {
+                                    "단어": p["word"],
+                                    "HSK 급수 (전체 체계)": p["formatted"],
+                                    f"{hsk_system}-기준 급수": (
+                                        p["sys_level"] if p["sys_level"] is not None else "—"
+                                    ),
+                                    "판정": "✅ 수준 내" if p["in_level"] else "⚠️ 수준 외/미수록",
+                                }
+                                for p in stats["per_word"]
+                            ]
+                            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+                            st.caption(
+                                "※ 판정 기준: drkameleon/complete-hsk-vocabulary · complete.json의 `level` 필드. "
+                                "'수준 외/미수록'에는 신조어·고유명사·jieba 분절 오류(예: 花儿)도 포함될 수 있습니다."
+                            )
+                        except FileNotFoundError as fe:
+                            st.warning(str(fe))
+                    else:
+                        st.info(
+                            "HSK 어휘부가 설정되지 않아 부합도 검증을 건너뜁니다. "
+                            "`data/complete-hsk-vocabulary/complete.json`이 존재하는지 확인하거나 "
+                            "`HSK_VOCAB_PATH` 환경변수를 설정하세요."
+                        )
                 except Exception as e:
                     st.error(f"오류 발생: {e}")
         elif run_adapt:
@@ -315,29 +375,63 @@ with tab2:
                     }
 
                     def normalize_item(d: dict) -> dict:
-                        return {FIELD_MAP.get(k, k): v for k, v in d.items()}
+                        out = {FIELD_MAP.get(k, k): v for k, v in d.items()}
+                        # 유형 값 정규화: '문화어', '文化词' 등 변종을 모두 '문화적어휘'로 통일
+                        if "유형" in out and isinstance(out["유형"], str):
+                            t = out["유형"].strip()
+                            if "문화" in t or "文化" in t:
+                                t = "문화적어휘"
+                            out["유형"] = t
+                        return out
 
                     items = [normalize_item(item) for item in items]
                     # ───────────────────────────────────────────────
+
+                    # ───── wordlist 기반 HSK등급 덮어쓰기 ─────
+                    # LLM이 뱉은 'HSK등급'은 환각 가능성이 크므로,
+                    # complete-hsk-vocabulary 의 level 필드로 권위 있는 값으로 교체한다.
+                    if vocab_available():
+                        for item in items:
+                            expr = str(item.get("표현", "")).strip()
+                            tags = get_level_tags(expr)
+                            if tags:
+                                item["HSK등급"] = format_levels(tags)   # 예: 'old-3 / new-1 / newest-2'
+                                item["_source"] = "wordlist"
+                            else:
+                                llm_guess = item.get("HSK등급", "")
+                                item["HSK등급"] = (
+                                    f"사전 외 (LLM 추정: {llm_guess})" if llm_guess else "사전 외"
+                                )
+                                item["_source"] = "llm"
+                    # ──────────────────────────────────────────
 
                     type_colors = {
                         "신조어": "tag",
                         "속어": "tag",
                         "관용어": "tag-blue",
                         "문법": "tag-green",
-                        "문화어": "tag-blue",
+                        "문화적어휘": "tag-blue",
                     }
 
                     for i, item in enumerate(items):
-                        tag_class = type_colors.get(item.get("유형", ""), "tag")
+                        # 유형 값 최종 방어선: 화면 출력 직전 한 번 더 정규화
+                        _raw_type = str(item.get("유형", "")).strip()
+                        type_display = "문화적어휘" if ("문화" in _raw_type or "文化" in _raw_type) else _raw_type
+
+                        tag_class = type_colors.get(type_display, "tag")
                         hsk_info = item.get("HSK등급", "해당 없음")
-                        hsk_badge = f"HSK {hsk_info}" if hsk_info not in ["해당 없음", ""] else "HSK 외"
+                        if item.get("_source") == "wordlist":
+                            hsk_badge = f"📗 {hsk_info}"   # 어휘부 검증됨
+                        elif item.get("_source") == "llm":
+                            hsk_badge = f"📒 {hsk_info}"   # 사전 외 (LLM 추정)
+                        else:
+                            hsk_badge = f"HSK {hsk_info}" if hsk_info not in ["해당 없음", ""] else "HSK 외"
 
                         st.markdown(f"""
 <div class="card card-blue">
 <strong style="font-size:1.1rem">{item.get('표현', '')}</strong>
 &nbsp; <em style="color:#7f8c8d">{item.get('병음', '')}</em>
-&nbsp; <span class="tag {tag_class}">{item.get('유형', '')}</span>
+&nbsp; <span class="tag {tag_class}">{type_display}</span>
 &nbsp; <span class="tag tag-green">{hsk_badge}</span>
 <br><br>
 📖 <strong>의미:</strong> {item.get('의미', '')}<br>
