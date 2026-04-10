@@ -41,6 +41,18 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+### 2-1. HSK 어휘부 배치 (신규)
+
+텍스트의 HSK 급수 검증을 위해 외부 어휘부를 참조합니다.
+
+```bash
+mkdir data
+cd data
+git clone https://github.com/drkameleon/complete-hsk-vocabulary.git
+```
+
+또는 임의 경로에 clone 후 환경변수 `HSK_VOCAB_PATH`로 지정 가능합니다.
+
 ### 3. API Key 입력
 
 앱 실행 후 사이드바에서 OpenAI 또는 Anthropic API Key를 입력하세요.
