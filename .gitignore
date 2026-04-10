@@ -21,6 +21,3 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
-
-# 외부 어휘부 (사용자가 별도로 git clone)
-data/complete-hsk-vocabulary/
